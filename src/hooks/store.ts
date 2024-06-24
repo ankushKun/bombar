@@ -7,10 +7,12 @@ interface GameState {
   address: string
   activeTab: TGameTabs
   name: string
+  location: [number, number]
   setWallet: (wallet: any) => void
   setAddress: (address: string) => void
   setActiveTab: (tab: TGameTabs) => void
   setName: (name: string) => void
+  setLocation: (location: [number, number]) => void
 }
 
 const gameStore = create<GameState>((set) => ({
@@ -18,10 +20,12 @@ const gameStore = create<GameState>((set) => ({
   wallet: null,
   activeTab: 'map',
   name: '',
+  location: [0, 0],
   setAddress: (address) => set({ address }),
   setWallet: (wallet) => set({ wallet }),
   setActiveTab: (activeTab) => set({ activeTab }),
-  setName: (name) => set({ name })
+  setName: (name) => set({ name }),
+  setLocation: (location:[number,number]) => set({ location })
 }))
 
 export default gameStore

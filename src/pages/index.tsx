@@ -8,6 +8,7 @@ const Map = dynamic(() => import('@/tabs/map'), {
 import BottomTabs from '@/components/bottom-tabs'
 import gameStore from '@/hooks/store'
 import { useEffect, useState } from "react"
+import Image from "next/image"
 
 import Arweave from 'arweave'
 import dynamic from "next/dynamic"
@@ -17,7 +18,8 @@ import { GAME_ID, runLua } from "@/utils/ao-vars"
 function App() {
   const [nick, setNick] = useState('')
   const [checking, setChecking] = useState(false)
-  const [name, setName, wallet, activeTab, setWallet, setAddress] = gameStore((state) => [state.name, state.setName, state.wallet, state.activeTab, state.setWallet, state.setAddress])
+  const [moving, setMoving] = useState(false)
+  const [name, setName, wallet, activeTab, setWallet, setAddress, location] = gameStore((state) => [state.name, state.setName, state.wallet, state.activeTab, state.setWallet, state.setAddress, state.location])
 
   useEffect(() => {
     const wallet = localStorage.getItem('bombar-wallet')
@@ -83,25 +85,62 @@ function App() {
     }
   }
 
+  async function movePlayer() {
+    const lat = location[0]
+    const lon = location[1]
+    console.log(lat, lon)
+    setMoving(true)
+    const mid = await runLua('', GAME_ID, [
+      { name: 'Action', value: 'Bombar.MovePlayer' },
+      { name: 'Lat', value: `${lat}` },
+      { name: 'Lon', value: `${lon}` }
+    ])
+    setMoving(false)
+    console.log(mid)
+    const { Messages } = mid
+    Messages.forEach((m: any) => {
+      const { Tags } = m
+      Tags.forEach((t: any) => {
+        if (t.name == 'Action' && t.value == 'Bombar.MovePlayerResponse') {
+          const { Data } = m
+          console.log(Data)
+          alert(Data + " [next move in 5min]")
+        }
+        if (t.name == 'Action' && t.value == 'Bombar.Cooldown') {
+          const { Data } = m
+          console.log("cooldown", Data)
+          alert("Cooldown: " + Data)
+
+        }
+      })
+    })
+  }
+
+
   return (
-    <main className="relative w-screen h-screen bg-black/15 text-center">
-      {name ? <div className="z-10">
+    <div className="text-center max-w-[100vw] max-h-screen">
+      {name ? <>
         {activeTab === 'map' && <Map />}
         {activeTab === 'you' && <You />}
         {activeTab === 'opt' && <Opt />}
-      </div> : <div className="w-screen h-screen flex flex-col items-center justify-center">
+      </> : <div className="w-screen h-screen flex flex-col items-center justify-center">
         {wallet ? <>
           <input type="text" className="bg-white p-1" placeholder="Enter your nickname" onChange={(e) => setNick(e.target.value)} />
           <button onClick={register}>Register</button>
-        </> : <button className="my-auto" disabled={checking} onClick={createWallet}>generate wallet</button>}
+        </> : <button className="my-auto" disabled={checking} onClick={createWallet}><span>generate wallet</span></button>}
       </div>}
 
 
-      <div className="fixed bottom-0 left-0 right-0 h-fit p-2.5 z-50">
+      <div className="fixed bottom-0 left-0 right-0 flex justify-between items-center h-fit p-2.5 z-50">
         <BottomTabs />
+        {activeTab == 'map' && <div className="p-1">
+          <button onClick={movePlayer}>
+            <Image src="/move-player.svg" width={50} height={50} alt="move player" data-moving={moving} className="data-[moving=true]:animate-spin" />
+          </button>
+        </div>}
       </div>
 
-    </main>
+    </div>
   )
 }
 

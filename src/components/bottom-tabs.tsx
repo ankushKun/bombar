@@ -21,9 +21,9 @@ function TabItem({icon, label, onClick}: {icon: React.ReactNode, label: string; 
 export default function BottomTabs(){
     const setActiveTab = useStore((state) => state.setActiveTab)
 
-    return <nav className="flex justify-evenly items-center p-1 rounded-full bg-white drop-shadow-lg border border-black/30">
+    return <nav className="flex justify-evenly items-center w-fit p-1 px-1.5 rounded-full bg-white drop-shadow-lg border border-black/30">
         <TabItem icon={<RiTreasureMapLine size={20} />} label="MAP" onClick={()=>setActiveTab('map')}/>
         <TabItem icon={<LiaUserSecretSolid size={25} />} label="YOU" onClick={()=>setActiveTab('you')} />
-        <TabItem icon={<CgOptions size={20} />} label="OPT" onClick={()=>setActiveTab('opt')}/>
+        {/* <TabItem icon={<CgOptions size={20} />} label="OPT" onClick={()=>setActiveTab('opt')}/> */}
     </nav>
 }

@@ -52,8 +52,8 @@ type TPlayers = {
 
 const activeIcon = L.icon({
   iconUrl: '/active-marker.svg',
-  iconSize: [50, 50],
-  iconAnchor: [25, 25],
+  iconSize: [10, 10],
+  iconAnchor: [5, 5],
 });
 
 const inactiveIcon = L.icon({

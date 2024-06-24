@@ -1,0 +1,35 @@
+{
+    "name": "BombAR",
+    "short_name": "BombAR",
+    "description": "A game where you can bomb your friends",
+    "icons": [
+        {
+            "src": "/bombar/manifest-icon-192.maskable.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/bombar/manifest-icon-512.maskable.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "/bombar/apple-icon-180.png",
+            "sizes": "180x180",
+            "type": "image/png",
+            "purpose": "apple touch icon"
+        },
+        {
+            "src": "/bombar/manifest-icon-512.maskable.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "theme_color": "#171717",
+    "background_color": "#e8ebf2",
+    "display": "standalone",
+    "scope": "/bombar",
+    "start_url": "/bombar",
+    "orientation": "portrait"
+}

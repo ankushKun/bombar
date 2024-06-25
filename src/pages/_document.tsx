@@ -15,8 +15,11 @@ export default function Document() {
           integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
           crossOrigin=""></script>
 
-        <link rel="icon" href="/bombar/emoji.svg" />
-        <link rel="apple-touch-icon" href="/bombar/emoji.ico" />
+        <link rel="icon" href="/bombar/joose.svg" />
+        <link rel="apple-touch-icon" href="/bombar/apple-icon-180.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+
+
         <meta name="theme-color" content="#000000" />
       </Head>
       <body>

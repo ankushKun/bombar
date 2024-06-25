@@ -133,7 +133,7 @@ export default function Map() {
   return <>
     <MapContainer center={location} zoom={16} scrollWheelZoom={false} className='w-screen h-screen z-0'>
       <TileLayer
-        // attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution='bombar.arweave.dev'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       {

@@ -49,7 +49,7 @@ Balances = Balances or { [ao.id] = utils.toBalanceValue(100000 * 10 ^ Denominati
 TotalSupply = TotalSupply or utils.toBalanceValue(100000 * 10 ^ Denomination)
 Name = "Joose Box"
 Ticker = 'JOOSE'
-Logo = 'nHIO6wFuyEKZ03glfjbpFiKObP782Sp425q4akilT44'
+Logo = 'hoIf0s3TJStPxLkdeGQtaE1w0hQKiKpYdEBuhpgBFRA'
 
 -- easily read from the database
 function sql_read(query, ...)
@@ -77,6 +77,15 @@ function sql_write(query, ...)
     stmt:finalize()
   end
   return db:changes()
+end
+
+function ClearPlayers()
+  local query = [[
+        DELETE FROM Players;
+        DELETE FROM Positions;
+    ]]
+  local changes = sql_write(query)
+  return "🗑️[ClearPlayers] " .. changes
 end
 
 -- common error handler
@@ -208,6 +217,12 @@ function move_player(msg)
       Target = address,
       Data = "👍[move_player] position created",
       Action = "Bombar.MovePlayerResponse"
+    })
+    Send({
+      Target = ao.id,
+      Action = 'Transfer',
+      Recipient = address,
+      Quantity = utils.toBalanceValue(100),
     })
   else
     local last_update = position[1].last_update
@@ -365,4 +380,3 @@ Handlers.add(
     handle_run(get_all_players, msg)
   end
 )
-

@@ -150,7 +150,7 @@ function App() {
 
       <div className="fixed bottom-0 left-0 right-0 flex justify-between items-end h-fit p-2.5 z-50">
         <BottomTabs />
-        {activeTab == 'map' && <div className="py-2 flex flex-col items-center justify-center gap-1">
+        {wallet && activeTab == 'map' && <div className="py-2 flex flex-col items-center justify-center gap-1">
           <div className="flex items-center gap-1">
             <div data-movable={moveTimer <= 0} className="text-red-400 h-fit data-[movable=true]:text-green-600 font-bold border border-black/30 bg-white/80 rounded-md px-1 shadow-black">{moveTimer<=0?"MOVE!": secondsToSecondsAndMinutes(moveTimer)}</div>
           <button onClick={movePlayer} className="bg-white rounded-full border border-black/30 text-xs w-fit">

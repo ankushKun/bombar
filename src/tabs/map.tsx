@@ -43,14 +43,14 @@ const PlayerMarker: React.FC<CustomMarkerProps> = ({ position, children }) => {
   //icon anchor should be 1x the zoom level
 
   const customIcon = L.icon({
-    iconUrl: '/player.png',
+    iconUrl: '/bombar/player.png',
     iconSize: [iconW * map.getZoom(), iconH * map.getZoom()],
-    iconAnchor: [iconW * map.getZoom() / 2, iconH],
+    iconAnchor: [iconW * map.getZoom() / 2, iconH * map.getZoom() / 2],
 
   });
 
   const currentPosition = map.getCenter()
-  if (currentPosition.lat == 0 && currentPosition.lng == 0) map.setView(position, 16)
+  if (currentPosition.lat == 0 && currentPosition.lng == 0) map.flyTo(position, 16)
 
   return (
     <Marker position={position} icon={customIcon}>
@@ -63,7 +63,7 @@ const ActivePlayerMarker: React.FC<CustomMarkerProps> = ({ position, children })
   const map = useMap();
 
   const customIcon = L.icon({
-    iconUrl: '/player-active.png',
+    iconUrl: '/bombar/player-active.png',
     iconSize: [iconW * map.getZoom(), iconH * map.getZoom()],
     iconAnchor: [iconW * map.getZoom() / 2, iconH],
   });
@@ -79,7 +79,7 @@ const InactivePlayerMarker: React.FC<CustomMarkerProps> = ({ position, children 
   const map = useMap();
 
   const customIcon = L.icon({
-    iconUrl: '/player-inactive.png',
+    iconUrl: '/bombar/player-inactive.png',
     iconSize: [iconW * map.getZoom(), iconH * map.getZoom()],
     iconAnchor: [iconW * map.getZoom() / 2, iconH],
   });
@@ -129,9 +129,9 @@ export default function Map() {
     return () => clearInterval(interval)
   }, [])
 
-  
+
   return <>
-    <MapContainer center={location} zoom={13} scrollWheelZoom={false} className='w-screen h-screen z-0'>
+    <MapContainer center={location} zoom={16} scrollWheelZoom={false} className='w-screen h-screen z-0'>
       <TileLayer
         // attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -140,7 +140,7 @@ export default function Map() {
         players?.active.map((player, index) => {
           if (player.address == address) return
           return <ActivePlayerMarker key={index} position={[player.lat, player.lon]}>
-            <Popup>
+            <Popup className="z-30">
               {player.name}
             </Popup>
           </ActivePlayerMarker>
@@ -150,7 +150,7 @@ export default function Map() {
         players?.inactive.map((player, index) => {
           if (player.address == address) return
           return <InactivePlayerMarker key={index} position={[player.lat, player.lon]}>
-            <Popup>
+            <Popup className="z-40">
               {player.name}
             </Popup>
           </InactivePlayerMarker>
@@ -158,7 +158,7 @@ export default function Map() {
       }
 
       <PlayerMarker position={location}>
-        <Popup>
+        <Popup className="z-20">
           This is your live location
         </Popup>
       </PlayerMarker>

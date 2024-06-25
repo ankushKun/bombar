@@ -14,8 +14,10 @@
     "arweave": "^1.15.1",
     "leaflet": "^1.9.4",
     "next": "14.2.4",
+    "next-pwa": "^5.6.0",
     "react": "^18",
     "react-dom": "^18",
+    "react-hot-toast": "^2.4.1",
     "react-leaflet": "^4.2.1",
     "zustand": "^4.5.2"
   },

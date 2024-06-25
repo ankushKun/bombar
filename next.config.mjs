@@ -2,7 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   output: 'export',
-  images:{
+  basePath: '/bombar',
+  images: {
     unoptimized: true
   }
 };

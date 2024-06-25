@@ -47,8 +47,8 @@ utils = {
 Denomination = 2
 Balances = Balances or { [ao.id] = utils.toBalanceValue(100000 * 10 ^ Denomination) }
 TotalSupply = TotalSupply or utils.toBalanceValue(100000 * 10 ^ Denomination)
-Name = "BombAR Coins"
-Ticker = 'BC'
+Name = "Joose Box"
+Ticker = 'JOOSE'
 Logo = 'nHIO6wFuyEKZ03glfjbpFiKObP782Sp425q4akilT44'
 
 -- easily read from the database

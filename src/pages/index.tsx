@@ -14,12 +14,20 @@ import Arweave from 'arweave'
 import dynamic from "next/dynamic"
 import { dryrun } from "@permaweb/aoconnect"
 import { GAME_ID, runLua } from "@/utils/ao-vars"
+import toast from "react-hot-toast"
+
+function secondsToSecondsAndMinutes(seconds: number) {
+  const minutes = Math.floor(seconds / 60)
+  const remainingSeconds = seconds % 60
+  return `${minutes}m ${remainingSeconds}s`
+}
 
 function App() {
   const [nick, setNick] = useState('')
   const [checking, setChecking] = useState(false)
   const [moving, setMoving] = useState(false)
   const [name, setName, wallet, activeTab, setWallet, setAddress, location] = gameStore((state) => [state.name, state.setName, state.wallet, state.activeTab, state.setWallet, state.setAddress, state.location])
+  const [moveTimer, setMoveTimer] = useState(0)
 
   useEffect(() => {
     const wallet = localStorage.getItem('bombar-wallet')
@@ -81,7 +89,7 @@ function App() {
     if (data.includes('registered')) {
       setName(nick)
     } else {
-      alert('Error registering: ' + data)
+      toast.error(data)
     }
   }
 
@@ -104,17 +112,25 @@ function App() {
         if (t.name == 'Action' && t.value == 'Bombar.MovePlayerResponse') {
           const { Data } = m
           console.log(Data)
-          alert(Data + " [next move in 5min]")
+          toast.success("+1 Joose Box for moving")
+          setMoveTimer(300)
         }
         if (t.name == 'Action' && t.value == 'Bombar.Cooldown') {
           const { Data } = m
           console.log("cooldown", Data)
-          alert("Cooldown: " + Data)
-
+          toast.error("Movement cooldown: " + secondsToSecondsAndMinutes(parseInt(Data.toString())) + "\nFeel free to bomb someone else in the meantime")
+          setMoveTimer(parseInt(Data))
         }
       })
     })
   }
+
+  useEffect(() => {
+    if (moveTimer <= 0) return
+    setTimeout(() => {
+      setMoveTimer(parseInt((moveTimer - 1).toString()))
+    }, 1000)
+  }, [moveTimer])
 
 
   return (
@@ -127,15 +143,16 @@ function App() {
         {wallet ? <>
           <input type="text" className="bg-white p-1" placeholder="Enter your nickname" onChange={(e) => setNick(e.target.value)} />
           <button onClick={register}>Register</button>
-        </> : <button className="my-auto" disabled={checking} onClick={createWallet}><span>generate wallet</span></button>}
+        </> : <button className="my-auto disabled:opacity-30" disabled={checking} onClick={createWallet}><span>{checking ? "loading..." : "generate wallet"}</span></button>}
       </div>}
 
 
       <div className="fixed bottom-0 left-0 right-0 flex justify-between items-center h-fit p-2.5 z-50">
         <BottomTabs />
-        {activeTab == 'map' && <div className="p-1">
-          <button onClick={movePlayer}>
-            <Image src="/move-player.svg" width={50} height={50} alt="move player" data-moving={moving} className="data-[moving=true]:animate-spin" />
+        {activeTab == 'map' && <div className="p-1 flex flex-col items-center justify-center gap-1">
+          <div data-movable={moveTimer <= 0} className="text-red-400 data-[movable=true]:text-green-400 font-bold border border-black/30 bg-white/80 rounded-md px-1 shadow-black">{secondsToSecondsAndMinutes(moveTimer)}</div>
+          <button onClick={movePlayer} className="bg-white rounded-full border border-black/30 text-xs w-fit">
+            <Image src="/bombar/move-player.svg" width={45} height={45} alt="move player" data-moving={moving} className="data-[moving=true]:animate-spin p-1" />
           </button>
         </div>}
       </div>

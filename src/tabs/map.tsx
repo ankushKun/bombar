@@ -50,7 +50,7 @@ const PlayerMarker: React.FC<CustomMarkerProps> = ({ position, children }) => {
   });
 
   const currentPosition = map.getCenter()
-  if (currentPosition.lat == 0 && currentPosition.lng == 0) map.flyTo(position, 16)
+  if (currentPosition.lat == 0 && currentPosition.lng == 0) map.flyTo(position, 17)
 
   return (
     <Marker position={position} icon={customIcon}>
@@ -135,6 +135,7 @@ export default function Map() {
       <TileLayer
         attribution='bombar.arweave.dev'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        // url='https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}.png'
       />
       {
         players?.active.map((player, index) => {

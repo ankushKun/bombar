@@ -26,8 +26,9 @@ function App() {
   const [nick, setNick] = useState('')
   const [checking, setChecking] = useState(false)
   const [moving, setMoving] = useState(false)
-  const [name, setName, wallet, activeTab, setWallet, setAddress, location] = gameStore((state) => [state.name, state.setName, state.wallet, state.activeTab, state.setWallet, state.setAddress, state.location])
+  const [name, setName, wallet, activeTab, setWallet, setAddress, location, address] = gameStore((state) => [state.name, state.setName, state.wallet, state.activeTab, state.setWallet, state.setAddress, state.location, state.address])
   const [moveTimer, setMoveTimer] = useState(0)
+  const [validWallet, setValidWallet] = useState(false)
 
   useEffect(() => {
     const wallet = localStorage.getItem('bombar-wallet')
@@ -41,6 +42,7 @@ function App() {
       })
       arweave.wallets.jwkToAddress(JSON.parse(wallet)).then(async (address) => {
         setChecking(true)
+        setAddress(address)
         const res = await dryrun({
           process: GAME_ID,
           data: address,
@@ -100,7 +102,7 @@ function App() {
   async function movePlayer() {
     const lat = location[0]
     const lon = location[1]
-    if(lat == 0 || lon == 0) return toast.error("Location not found")
+    if (lat == 0 || lon == 0) return toast.error("Location not found")
     console.log(lat, lon)
     setMoving(true)
     const mid = await runLua('', GAME_ID, [
@@ -138,6 +140,36 @@ function App() {
     return () => clearTimeout(t)
   }, [moveTimer])
 
+  function processFile(e: any) {
+    if (!e.target.files.length) return toast.error("No file selected")
+    const file = e.target.files[0]
+    const reader = new FileReader()
+    reader.onload = async (e) => {
+      try {
+        const wallet = JSON.parse(e.target?.result as string)
+        const arweave = Arweave.init({
+          host: 'arweave.net',
+          port: 443,
+          protocol: 'https',
+        })
+        const address = await arweave.wallets.jwkToAddress(wallet)
+        setValidWallet(true)
+        setAddress(address)
+        setWallet(wallet)
+        window.arweaveWallet = wallet
+        localStorage.setItem('bombar-wallet', JSON.stringify(wallet))
+        toast.success("Wallet loaded successfully")
+      } catch (err) {
+        toast.error("Invalid wallet file")
+        setValidWallet(false)
+        // reset the input
+        const inputItem = document.querySelector('#wallet-input') as HTMLInputElement
+        inputItem.value = ''
+      }
+    }
+    reader.readAsText(file)
+  }
+
 
   return (
     <div className="text-center max-w-[100vw] max-h-screen">
@@ -149,6 +181,7 @@ function App() {
         <Image src="/bombar/joose.svg" width={100} height={100} alt="joose" className="w-1/3 mx-auto" />
         <div className="mb-10">             <span className="font-bold text-xl text-green-600"> BombAR</span> <br /> Bomb your friends to get their JOOSE!<br />
           <span className="text-xs">This is a real life location based game</span>
+          <span className="text-xs">{address}</span>
         </div>
 
         {wallet ? <>
@@ -156,7 +189,9 @@ function App() {
           <button onClick={register} disabled={checking} className="disabled:opacity-30 ring-2 ring-green-400 text-green-800 font-bold rounded h-fit p-2 px-6 bg-green-200">{checking ? "Loading..." : "Register Nickname"}</button>
         </> : <>
           <button className="disabled:opacity-30 ring-2 ring-green-400 text-green-800 font-bold rounded h-fit p-2 px-6 bg-green-200" disabled={checking} onClick={createWallet}><span>{checking ? "loading..." : "generate wallet"}</span></button>
-
+          <label htmlFor="file" className="mt-5">or upload one</label>
+          <input type="file" id="wallet-input" disabled={checking} accept=".json" className="bg-white p-1 ring-2 rounded ring-green-400 text-green-800 focus:outline-none" onChange={(e) => processFile(e)} />
+          {validWallet && <button className="disabled:opacity-30 ring-2 ring-green-400 text-green-800 font-bold rounded h-fit p-2 px-6 bg-green-200" onClick={createWallet}><span>Next</span></button>}
         </>}
       </div>}
 
@@ -166,8 +201,8 @@ function App() {
         {activeTab == 'map' && <div className="py-2 flex flex-col items-center justify-center gap-1">
           <div className="flex items-center gap-1">
             <div data-movable={moveTimer <= 0} className="text-red-400 h-fit data-[movable=true]:text-green-600 font-bold border border-black/30 bg-white/80 rounded-md px-1 shadow-black">{moveTimer <= 0 ? "MOVE!" : secondsToSecondsAndMinutes(moveTimer)}</div>
-            <button onClick={movePlayer} className="bg-white/70 rounded-full border border-black/30 text-xs w-fit">
-              <Image src="/bombar/move-player.svg" width={45} height={45} alt="move player" data-moving={moving} className="data-[moving=true]:animate-spin p-1" />
+            <button onClick={movePlayer} data-movable={moveTimer <= 0} className="bg-white/70 data-[movable=true]:bg-green-400/70 rounded-full border border-black/30 text-xs w-fit">
+              <Image src="/bombar/move-player.svg" width={52} height={52} alt="move player" data-moving={moving} className="data-[moving=true]:animate-spin p-1" />
             </button>
           </div>
         </div>}

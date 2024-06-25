@@ -10,6 +10,15 @@ export default function You() {
   const [address, name] = gameStore((state) => [state.address, state.name])
   const [balance, setBalance] = useState(0)
 
+  function downloadWallet() {
+    const element = document.createElement("a");
+    const file = new Blob([JSON.stringify(window.arweaveWallet)], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = "BombAR-"+address+".json";
+    document.body.appendChild(element); // Required for this to work in FireFox
+    element.click();
+  }
+
 
   useEffect(() => {
     setBalance(parseInt(localStorage.getItem('bombar-balance') || "0") / Denominator)
@@ -27,7 +36,10 @@ export default function You() {
   }, [])
 
   return <div className="flex flex-col items-center justify-center h-screen gap-5">
-    <button className="fixed top-0 right-0 p-1 text-xl" onClick={() => window.location.reload()}>🔄</button>
+    <div className="fixed top-0 left-0 p-1 text-xs flex flex-col  text-left gap-5" >
+      <button onClick={() => window.location.reload()} className="w-fit">🔄 refresh</button>
+      <button onClick={downloadWallet} className="w-fit">⏬ download</button>
+    </div>
     <Image src="/bombar/player.png" width={100} height={150} alt="player" className="" />
 
     <div className="text-xl font-bold">{name}</div>

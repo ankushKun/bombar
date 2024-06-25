@@ -77,17 +77,21 @@ function App() {
     setAddress(address)
     localStorage.setItem('bombar-wallet', JSON.stringify(key))
     window.arweaveWallet = key as any
+    toast.success("Wallet generated!\nPlease enter a nickname")
   }
 
   async function register() {
+    setChecking(true)
     const res = await runLua(nick, GAME_ID, [
       { name: 'Action', value: 'Bombar.Register' },
     ])
+    setChecking(false)
     console.log(res)
     const { Messages } = res
     const data = Messages[0].Data as string
     if (data.includes('registered')) {
       setName(nick)
+      toast.success("Player Registered successfully\nHappy Joosing!")
     } else {
       toast.error(data)
     }
@@ -96,6 +100,7 @@ function App() {
   async function movePlayer() {
     const lat = location[0]
     const lon = location[1]
+    if(lat == 0 || lon == 0) return toast.error("Location not found")
     console.log(lat, lon)
     setMoving(true)
     const mid = await runLua('', GAME_ID, [
@@ -140,25 +145,33 @@ function App() {
         {activeTab === 'map' && <Map />}
         {activeTab === 'you' && <You />}
         {activeTab === 'opt' && <Opt />}
-      </> : <div className="w-screen h-screen flex flex-col items-center justify-center">
+      </> : <div className="w-screen h-screen flex flex-col items-center justify-center gap-0">
+        <Image src="/bombar/joose.svg" width={100} height={100} alt="joose" className="w-1/3 mx-auto" />
+        <div className="mb-10">             <span className="font-bold text-xl text-green-600"> BombAR</span> <br /> Bomb your friends to get their JOOSE!<br />
+          <span className="text-xs">This is a real life location based game</span>
+        </div>
+
         {wallet ? <>
-          <input type="text" className="bg-white p-1" placeholder="Enter your nickname" onChange={(e) => setNick(e.target.value)} />
-          <button onClick={register}>Register</button>
-        </> : <button className="my-auto disabled:opacity-30" disabled={checking} onClick={createWallet}><span>{checking ? "loading..." : "generate wallet"}</span></button>}
+          <input type="text" disabled={checking} className="bg-white p-1 ring-2 mb-2 rounded ring-green-400 text-green-800 focus:outline-none" placeholder="Enter your nickname" onChange={(e) => setNick(e.target.value)} />
+          <button onClick={register} disabled={checking} className="disabled:opacity-30 ring-2 ring-green-400 text-green-800 font-bold rounded h-fit p-2 px-6 bg-green-200">{checking ? "Loading..." : "Register Nickname"}</button>
+        </> : <>
+          <button className="disabled:opacity-30 ring-2 ring-green-400 text-green-800 font-bold rounded h-fit p-2 px-6 bg-green-200" disabled={checking} onClick={createWallet}><span>{checking ? "loading..." : "generate wallet"}</span></button>
+
+        </>}
       </div>}
 
 
-      <div className="fixed bottom-0 left-0 right-0 flex justify-between items-end h-fit p-2.5 z-50">
+      {name && <div className="fixed bottom-0 left-0 right-0 flex justify-between items-end h-fit p-2.5 z-50">
         <BottomTabs />
-        {wallet && activeTab == 'map' && <div className="py-2 flex flex-col items-center justify-center gap-1">
+        {activeTab == 'map' && <div className="py-2 flex flex-col items-center justify-center gap-1">
           <div className="flex items-center gap-1">
-            <div data-movable={moveTimer <= 0} className="text-red-400 h-fit data-[movable=true]:text-green-600 font-bold border border-black/30 bg-white/80 rounded-md px-1 shadow-black">{moveTimer<=0?"MOVE!": secondsToSecondsAndMinutes(moveTimer)}</div>
-          <button onClick={movePlayer} className="bg-white rounded-full border border-black/30 text-xs w-fit">
-            <Image src="/bombar/move-player.svg" width={45} height={45} alt="move player" data-moving={moving} className="data-[moving=true]:animate-spin p-1" />
-          </button>
+            <div data-movable={moveTimer <= 0} className="text-red-400 h-fit data-[movable=true]:text-green-600 font-bold border border-black/30 bg-white/80 rounded-md px-1 shadow-black">{moveTimer <= 0 ? "MOVE!" : secondsToSecondsAndMinutes(moveTimer)}</div>
+            <button onClick={movePlayer} className="bg-white/70 rounded-full border border-black/30 text-xs w-fit">
+              <Image src="/bombar/move-player.svg" width={45} height={45} alt="move player" data-moving={moving} className="data-[moving=true]:animate-spin p-1" />
+            </button>
           </div>
         </div>}
-      </div>
+      </div>}
 
     </div>
   )

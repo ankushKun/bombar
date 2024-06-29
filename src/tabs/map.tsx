@@ -1,7 +1,7 @@
-import { MapContainer, MapContainerProps, Marker, Popup, TileLayer, useMap } from "react-leaflet";
+import { Circle, MapContainer, MapContainerProps, Marker, Popup, TileLayer, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, SetStateAction, Dispatch } from "react";
 import { dryrun } from "@permaweb/aoconnect";
 import { GAME_ID, runLua } from "@/utils/ao-vars";
 import gameStore from "@/hooks/store";
@@ -69,9 +69,28 @@ const ActivePlayerMarker: React.FC<CustomMarkerProps> = ({ position, children })
   });
 
   return (
-    <Marker position={position} icon={customIcon}>
+    <Marker position={position} icon={customIcon} title="hihi">
       {children}
     </Marker>
+  );
+}
+
+function LocationMarker({bombLoc, setBombLoc,bombRadius=100}: {bombLoc: L.LatLngExpression, setBombLoc: (e:L.LatLngExpression)=>void, bombRadius?: number}) {
+
+  const map = useMapEvents({
+    click(e) {
+      map.flyTo(e.latlng, map.getZoom());
+      setBombLoc(e.latlng)
+    },
+  });
+
+  return bombLoc == null ? null : (
+    <><Circle center={bombLoc} radius={100} pathOptions={{ color: "red", fillOpacity: 0.3 }}>
+    </Circle>
+    <Circle center={bombLoc} radius={5} pathOptions={{ color: "red", fillOpacity:1 }} >
+        <Popup>Bomb coords: {bombLoc&&bombLoc!.toString()}<br />Blast Radius: {bombRadius}m</Popup>
+      </Circle>
+    </>
   );
 }
 
@@ -96,6 +115,7 @@ export default function Map() {
   // const [geoLocation, setGeoLocation] = useState<[number, number]>([0, 0])
   const [location, setLocation] = gameStore((state) => [state.location, state.setLocation])
   const [address] = gameStore((state) => [state.address])
+  const [bombLoc, setBombLoc] = gameStore((state) => [state.bombLoc, state.setBombLoc])
   const [players, setPlayers] = useState<TPlayers>()
 
   useEffect(() => {
@@ -163,6 +183,8 @@ export default function Map() {
           This is your live location
         </Popup>
       </PlayerMarker>
+
+      <LocationMarker bombLoc={bombLoc!} setBombLoc={setBombLoc} bombRadius={100} />
     </MapContainer>
   </>
 }

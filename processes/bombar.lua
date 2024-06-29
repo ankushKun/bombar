@@ -26,6 +26,15 @@ db:exec [[
         last_update INTEGER NOT NULL,
         FOREIGN KEY(address) REFERENCES Players(address)
     );
+
+    CREATE TABLE IF NO EXISTS Bombs (
+        address TEXT NOT NULL,
+        lat REAL NOT NULL,
+        lon REAL NOT NULL,
+        time_added INTEGER NOT NULL,
+        explode_after INTEGER NOT NULL,
+        FOREIGN KEY(address) REFERENCES Positions(address)
+    )
 ]]
 
 utils = {

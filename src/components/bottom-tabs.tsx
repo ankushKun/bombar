@@ -1,8 +1,9 @@
-import { RiTreasureMapLine } from "react-icons/ri";
-import { LiaUserSecretSolid } from "react-icons/lia";
-import { CgOptions } from "react-icons/cg";
+import mapIcon from "@/assets/map.svg";
+import accountIcon from "@/assets/account.svg";
+
 
 import useStore from "../hooks/store";
+import Image from "next/image";
 
 
 
@@ -22,8 +23,8 @@ export default function BottomTabs(){
     const setActiveTab = useStore((state) => state.setActiveTab)
 
     return <nav className="flex justify-evenly items-center w-fit p-1 px-1.5 rounded-full bg-white drop-shadow-lg border border-black/30">
-        <TabItem icon={<RiTreasureMapLine size={20} />} label="MAP" onClick={()=>setActiveTab('map')}/>
-        <TabItem icon={<LiaUserSecretSolid size={25} />} label="YOU" onClick={()=>setActiveTab('you')} />
-        {/* <TabItem icon={<CgOptions size={20} />} label="OPT" onClick={()=>setActiveTab('opt')}/> */}
+        <TabItem icon={<Image src={mapIcon} width={25} height={25}  alt="map"/>} label="MAP" onClick={()=>setActiveTab('map')}/>
+        <TabItem icon={<Image src={accountIcon} width={25} height={25} alt="account"/>} label="YOU" onClick={()=>setActiveTab('you')} />
+
     </nav>
 }

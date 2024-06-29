@@ -1,5 +1,9 @@
 import You from "@/tabs/you"
 import Opt from "@/tabs/opt"
+
+import cancelIcon from "@/assets/cancel.svg"
+import deadIcon from "@/assets/dead.svg"
+
 const Map = dynamic(() => import('@/tabs/map'), {
   loading: () => <p>Loading...</p>,
   ssr: false
@@ -26,7 +30,7 @@ function App() {
   const [nick, setNick] = useState('')
   const [checking, setChecking] = useState(false)
   const [moving, setMoving] = useState(false)
-  const [name, setName, wallet, activeTab, setWallet, setAddress, location, address] = gameStore((state) => [state.name, state.setName, state.wallet, state.activeTab, state.setWallet, state.setAddress, state.location, state.address])
+  const [name, setName, wallet, activeTab, setWallet, setAddress, location, address, bombLoc, setBombLoc] = gameStore((state) => [state.name, state.setName, state.wallet, state.activeTab, state.setWallet, state.setAddress, state.location, state.address, state.bombLoc, state.setBombLoc])
   const [moveTimer, setMoveTimer] = useState(0)
   const [validWallet, setValidWallet] = useState(false)
 
@@ -198,7 +202,17 @@ function App() {
 
       {name && <div className="fixed bottom-0 left-0 right-0 flex justify-between items-end h-fit p-2.5 z-50">
         <BottomTabs />
-        {activeTab == 'map' && <div className="py-2 flex flex-col items-center justify-center gap-1">
+        {activeTab == 'map' && <div className="py-2 flex flex-col items-end gap-4">
+          {bombLoc && <div className="flex items-end gap-2 justify-end">
+            <button onClick={() => setBombLoc(null as any)} className="flex flex-col items-center justify-center">
+              <Image src={cancelIcon} width={40} height={40} alt="cancel bomb" />
+              cancel
+            </button>
+            <button className="flex flex-col items-center justify-center">
+              <Image src={deadIcon} width={52} height={52} alt="bomb" />
+              bomb
+            </button>
+          </div>}
           <div className="flex items-center gap-1">
             <div data-movable={moveTimer <= 0} className="text-red-400 h-fit data-[movable=true]:text-green-600 font-bold border border-black/30 bg-white/80 rounded-md px-1 shadow-black">{moveTimer <= 0 ? "MOVE!" : secondsToSecondsAndMinutes(moveTimer)}</div>
             <button onClick={movePlayer} data-movable={moveTimer <= 0} className="bg-white/70 data-[movable=true]:bg-green-400/70 rounded-full border border-black/30 text-xs w-fit">
